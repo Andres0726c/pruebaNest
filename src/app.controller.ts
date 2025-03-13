@@ -1,38 +1,55 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { AppService } from './app.service';
-import { PersonaDto } from './app.dto';
 
 @Controller('app')
 export class AppController {
   constructor(private readonly appServices: AppService) {}
 
   @Get()
-  getAll() {
-    return this.appServices.buscar();
+  public buscarTodos() {
+    return this.appServices.buscarTodos();
   }
 
   @Get(':id')
-  getOne(@Param('id') id: string) {
+  public buscarPorId(@Param('id') id: string) {
     return this.appServices.buscarPorId(parseInt(id));
   }
 
   @Post()
-  create(@Body() personaDto: PersonaDto) {
-    return this.appServices.agregar(personaDto);
+  public crear(
+    @Body()
+    persona: {
+      primerNombre: string;
+      documento: string;
+      correo: string;
+    },
+  ) {
+    try {
+      return this.appServices.agregar(persona);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() personaDto: PersonaDto) {
-    return this.appServices.actualizar(parseInt(id), personaDto);
+  public actualizar(
+    @Param('id') id: number,
+    @Body()
+    persona: { primerNombre: string; documento: string; correo: string },
+  ) {
+    return this.appServices.actualizarPersona(id, persona);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.appServices.eliminar(parseInt(id));
+  public eliminar(@Param('id') id: number) {
+    return this.appServices.eliminar(id);
   }
-  // @Get()
-  // getHello(): any {
-  //   return this.appServices.getHello();
-  // }
 }
-

@@ -1,43 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AppRepository } from './app.repository';
-
-import { PersonaDto } from './app.dto';
 
 @Injectable()
 export class AppService {
-  private personas = [
-    { id: 1, nombre: 'Andrés', documento: '123456789' },
-    { id: 2, nombre: 'Camilo', documento: '987654321' },
-  ];
-
-  buscar(): any[] {
-    return this.personas;
+  public buscarTodos(): any[] {
+    return AppRepository.buscarTodos();
   }
 
-  buscarPorId(id: number) {
-    return this.personas.find((p) => p.id === id);
-  }
-
-  agregar(personaDto: PersonaDto) {
-    const nuevaPersona = { id: this.personas.length + 1, ...personaDto };
-    this.personas.push(nuevaPersona);
-    return nuevaPersona;
-  }
-
-  actualizar(id: number, personaDto: PersonaDto) {
-    const index = this.personas.findIndex((p) => p.id === id);
-    if (index !== -1) {
-      this.personas[index] = { id, ...personaDto };
-      return this.personas[index];
+  public buscarPorId(id: number) {
+    if (!AppRepository.buscarPorId(id)) {
+      throw new HttpException( { message: 'No existe la persona' }, HttpStatus.NOT_FOUND, );
     }
-    return null;
+    return AppRepository.buscarPorId(id);
   }
 
-  eliminar(id: number) {
-    this.personas = this.personas.filter((p) => p.id !== id);
-    return { message: 'Persona eliminada' };
+  public agregar(persona: {
+    primerNombre: string;
+    documento: string;
+    correo: string;
+  }) {
+    const personaExistente = AppRepository.buscarPorDocumento(
+      persona.documento,
+    );
+    if (personaExistente) {
+      throw new HttpException(
+        { message: 'Ya existe una persona con ese documento' },
+        HttpStatus.CONFLICT,
+      );
+    }
+    return persona;
   }
-  // getHello(): any[] {
-  //   return AppRepository.obtenerPersonas();
-  // }
+
+  public actualizarPersona(
+    id: number,
+    persona: { primerNombre: string; documento: string; correo: string },
+  ) {
+    const idExistente = AppRepository.buscarPorId(id);
+    if (!idExistente) {
+      throw new HttpException(
+        { message: 'No existe la persona' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return AppRepository.actualizarPersona(id, persona);
+  }
+
+  public eliminar(id: number) {
+    const idExistente = AppRepository.buscarPorId(id);
+    console.log("idExistente", idExistente);
+    if (!idExistente) {
+      throw new HttpException(
+        { message: 'No existe la persona' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+      return AppRepository.eliminarPersona(id);
+  }
 }

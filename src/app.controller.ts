@@ -33,7 +33,7 @@ export class AppController {
     },
   ) {
     try {
-      return this.appServices.agregar(persona);
+      return this.appServices.agregarPersona(persona);
     } catch (error) {
       throw error;
     }

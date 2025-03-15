@@ -30,7 +30,19 @@ export class AppRepository {
     return this.personas;
   }
 
-  public static agregar(persona: {
+  public static buscarPorDocumento(documento: string) {
+    return this.personas.find((persona) => persona.documento === documento);
+  }
+
+  public static buscarPorCorreo(correo: string) {
+    return this.personas.find((persona) => persona.correo === correo);
+  }
+
+  public static buscarPorId(id: number) {
+    return this.personas.find((persona) => Number(persona.id) === Number(id));
+  }
+
+  public static agregarPersona(persona: {
     primerNombre: string;
     documento: string;
     correo: string;
@@ -40,19 +52,13 @@ export class AppRepository {
     return nuevoUsuario;
   }
 
-  public static buscarPorDocumento(documento: string) {
-    return this.personas.find((persona) => persona.documento === documento);
-  }
-
-  public static buscarPorId(id: number) {
-    return this.personas.find((persona) => persona.id === Number(id));
-  }
-
   public static actualizarPersona(
     id: number,
     persona: { primerNombre: string; documento: string; correo: string },
   ) {
-    const index = this.personas.findIndex((persona) => persona.id === Number(id));
+    const index = this.personas.findIndex(
+      (persona) => Number(persona.id) === Number(id),
+    );
     if (index !== -1) {
       this.personas[index] = { id, ...persona };
       return this.personas[index];

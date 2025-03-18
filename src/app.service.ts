@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AppRepository } from './app.repository';
+import { Persona } from './interfaces/persona.interface';
 
 @Injectable()
 export class AppService {
@@ -17,11 +18,7 @@ export class AppService {
     return AppRepository.buscarPorId(id);
   }
 
-  public personaExistente(persona: {
-    primerNombre: string;
-    documento: string;
-    correo: string;
-  }) {
+  public buscarPersonaExistente(persona: Persona) {
     const personaExistente = AppRepository.buscarPorDocumento(
       persona.documento,
     );
@@ -33,11 +30,7 @@ export class AppService {
     }
   }
 
-  public correoExistente(persona: {
-    primerNombre: string;
-    documento: string;
-    correo: string;
-  }) {
+  public buscarCorreoExistente(persona: Persona) {
     const correoExistente = AppRepository.buscarPorCorreo(persona.correo);
     if (correoExistente) {
       throw new HttpException(
@@ -47,21 +40,21 @@ export class AppService {
     }
   }
 
-  public agregarPersona(persona: {
-    primerNombre: string;
-    documento: string;
-    correo: string;
-  }) {
-    this.personaExistente(persona);
-    this.correoExistente(persona);
+  public agregarPersona(persona: Persona) {
+    this.buscarPersonaExistente(persona);
+    this.buscarCorreoExistente(persona);
+
+    if (!this.esMayorDeEdad(persona.edad)) {
+      throw new HttpException(
+        { message: 'La persona no es mayor de edad' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     return AppRepository.agregarPersona(persona);
   }
 
-  public actualizarPersona(
-    id: number,
-    persona: { primerNombre: string; documento: string; correo: string },
-  ) {
+  public actualizarPersona(id: number, persona: Persona) {
     const idExistente = AppRepository.buscarPorId(id);
     if (!idExistente) {
       throw new HttpException(
@@ -69,13 +62,17 @@ export class AppService {
         HttpStatus.NOT_FOUND,
       );
     } else {
-      this.personaExistente(persona);
-      this.correoExistente(persona);
+      this.buscarPersonaExistente(persona);
+      this.buscarCorreoExistente(persona);
     }
     return AppRepository.actualizarPersona(id, persona);
   }
 
-  public eliminar(id: number) {
+  private esMayorDeEdad(edad: number): boolean {
+    return edad >= 18;
+  }
+
+  public eliminarPersona(id: number) {
     const idExistente = AppRepository.buscarPorId(id);
     if (!idExistente) {
       throw new HttpException(

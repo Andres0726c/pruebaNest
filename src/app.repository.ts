@@ -1,28 +1,34 @@
+import { Persona } from './interfaces/persona.interface';
+
 export class AppRepository {
-  public static personas = [
+  private static personas = [
     {
       id: 1,
       primerNombre: 'Andrés',
       documento: '123',
       correo: 'admin@gmail.com',
+      edad: 25,
     },
     {
       id: 2,
       primerNombre: 'Camilo',
       documento: '456',
       correo: 'admin2@gmail.com',
+      edad: 17,
     },
     {
       id: 3,
       primerNombre: 'Felipe',
       documento: '789',
       correo: 'admin3@gmail.com',
+      edad: 18,
     },
     {
       id: 4,
       primerNombre: 'David',
       documento: '012',
       correo: 'admin4@gmail.com',
+      edad: 20,
     },
   ];
 
@@ -42,20 +48,13 @@ export class AppRepository {
     return this.personas.find((persona) => Number(persona.id) === Number(id));
   }
 
-  public static agregarPersona(persona: {
-    primerNombre: string;
-    documento: string;
-    correo: string;
-  }) {
+  public static agregarPersona(persona: Persona) {
     const nuevoUsuario = { id: this.personas.length + 1, ...persona };
     this.personas.push(nuevoUsuario);
     return nuevoUsuario;
   }
 
-  public static actualizarPersona(
-    id: number,
-    persona: { primerNombre: string; documento: string; correo: string },
-  ) {
+  public static actualizarPersona(id: number, persona: Persona) {
     const index = this.personas.findIndex(
       (persona) => Number(persona.id) === Number(id),
     );

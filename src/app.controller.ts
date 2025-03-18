@@ -8,6 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { AppService } from './app.service';
+import { PersonaDto } from './Dto/persona.dto';
 
 @Controller('app')
 export class AppController {
@@ -15,22 +16,26 @@ export class AppController {
 
   @Get()
   public buscarTodos() {
-    return this.appServices.buscarTodos();
+    try {
+      return this.appServices.buscarTodos();
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get(':id')
   public buscarPorId(@Param('id') id: string) {
-    return this.appServices.buscarPorId(parseInt(id));
+    try {
+      return this.appServices.buscarPorId(parseInt(id));
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post()
-  public crear(
+  public agregarPersona(
     @Body()
-    persona: {
-      primerNombre: string;
-      documento: string;
-      correo: string;
-    },
+    persona: PersonaDto,
   ) {
     try {
       return this.appServices.agregarPersona(persona);
@@ -40,16 +45,24 @@ export class AppController {
   }
 
   @Put(':id')
-  public actualizar(
+  public actualizarPersona(
     @Param('id') id: number,
     @Body()
-    persona: { primerNombre: string; documento: string; correo: string },
+    persona: PersonaDto,
   ) {
-    return this.appServices.actualizarPersona(id, persona);
+    try {
+      return this.appServices.actualizarPersona(id, persona);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Delete(':id')
-  public eliminar(@Param('id') id: number) {
-    return this.appServices.eliminar(id);
+  public eliminarPersona(@Param('id') id: number) {
+    try {
+      return this.appServices.eliminarPersona(id);
+    } catch (error) {
+      throw error;
+    }
   }
 }
